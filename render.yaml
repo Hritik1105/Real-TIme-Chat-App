@@ -14,15 +14,6 @@ services:
       - key: SECRET_KEY
         generateValue: true
 
-  - type: web
-    name: chat-frontend
-    env: static
-    rootDir: frontend
-    buildCommand: "npm install && npm run build"
-    staticPublishPath: "./dist"
-    envVars:
-      - key: VITE_API_URL
-        sync: false
 
 databases:
   - name: chat-db
