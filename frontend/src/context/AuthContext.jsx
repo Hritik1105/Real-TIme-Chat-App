@@ -12,7 +12,9 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    // Strip trailing slash if present
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'https://chat-backend-k7aj.onrender.com';
+    const API_URL = rawApiUrl.replace(/\/+$/, '');
 
     useEffect(() => {
         if (token) {

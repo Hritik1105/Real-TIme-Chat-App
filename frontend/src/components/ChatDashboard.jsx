@@ -13,10 +13,12 @@ export default function ChatDashboard() {
     const [showNewRoomInput, setShowNewRoomInput] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
     const [darkMode, setDarkMode] = useState(false);
-    
+
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    // Strip trailing slash if present
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'https://chat-backend-k7aj.onrender.com';
+    const API_URL = rawApiUrl.replace(/\/+$/, '');
     const WS_URL = import.meta.env.VITE_WS_URL || API_URL.replace(/^http/, 'ws');
 
     // Theme setup
@@ -63,7 +65,7 @@ export default function ChatDashboard() {
 
     const handleCreateRoom = async (e) => {
         e.preventDefault();
-        if(!newRoomName.trim()) return;
+        if (!newRoomName.trim()) return;
         try {
             const res = await axios.post(`${API_URL}/chat/rooms`, { name: newRoomName, is_group: true });
             setRooms([...rooms, res.data]);
@@ -79,7 +81,7 @@ export default function ChatDashboard() {
     useEffect(() => {
         if (!token) return;
         ws.current = new WebSocket(`${WS_URL}/chat/ws/${token}`);
-        
+
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'chat_message') {
@@ -122,13 +124,13 @@ export default function ChatDashboard() {
     const sendMessage = (e) => {
         e.preventDefault();
         if (!newMessage.trim() || !activeRoom || !ws.current) return;
-        
+
         const msgData = {
             type: 'chat_message',
             content: newMessage,
             room_id: activeRoom.id
         };
-        
+
         ws.current.send(JSON.stringify(msgData));
         setNewMessage('');
     };
@@ -176,7 +178,7 @@ export default function ChatDashboard() {
 
                     {showNewRoomInput && (
                         <form onSubmit={handleCreateRoom} className="mb-4 flex gap-2">
-                            <input 
+                            <input
                                 type="text" value={newRoomName} onChange={e => setNewRoomName(e.target.value)}
                                 placeholder="Room name" className="flex-1 px-3 py-1 text-sm border rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500" autoFocus
                             />
@@ -186,7 +188,7 @@ export default function ChatDashboard() {
 
                     <div className="space-y-1">
                         {rooms.map(room => (
-                            <button 
+                            <button
                                 key={room.id}
                                 onClick={() => setActiveRoom(room)}
                                 className={`w-full text-left px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${activeRoom?.id === room.id ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
@@ -220,7 +222,7 @@ export default function ChatDashboard() {
                                 const isMe = msg.sender_id === user?.id;
                                 // Simple way to format time
                                 const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                                
+
                                 return (
                                     <div key={msg.id || idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                                         <div className={`flex items-end gap-2 max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
