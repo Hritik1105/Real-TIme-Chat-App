@@ -21,10 +21,7 @@ services:
     staticPublishPath: "./dist"
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: chat-backend
-          property: url
+        sync: false
 
 databases:
   - name: chat-db
