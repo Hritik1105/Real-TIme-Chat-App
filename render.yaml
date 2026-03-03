@@ -5,6 +5,7 @@ services:
     rootDir: backend
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -27,3 +28,4 @@ databases:
   - name: chat-db
     databaseName: chat
     user: chat_user
+    plan: free
